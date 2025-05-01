@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Metadata -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="author" content="George W. Park">
+    <meta name="description" content="This project demonstrates how CSS grid (with flexbox and float fallback) can be used to re-create the layout of an Instagram profile page.">
+
+    <title>{{ profile.user.username }}'s Profile</title>
+
+    <style>
+        /* General styling */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #babc4d;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-left: 90px;
+            background-color: #babc4d;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-image-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-left: 90px;
+        }
+
+        .profile-info {
+            flex-grow: 1;
+            margin-left: 90px;
+        }
+
+        .profile-name h3 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .profile-name h5 {
+            color: #777;
+            font-size: 16px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .profile-btn {
+            padding: 8px 16px;
+            background-color: #babc4d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .profile-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Follow and Unfollow buttons */
+        .follow-btn {
+            background-color: #28a745;
+        }
+
+        .follow-btn:hover {
+            background-color: #218838;
+        }
+
+        .unfollow-btn {
+            background-color: #dc3545;
+        }
+
+        .unfollow-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Profile Bio */
+        .profile-bio {
+            padding: 20px;
+            background-color: #babc4d;
+            margin-top: 20px;
+        }
+
+        .profile-bio p {
+            margin: 10px 0;
+        }
+
+        .profile-bio a {
+            color: #007BFF;
+        }
+
+        /* Profile Stats */
+        .profile-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            margin-left: 90px;
+            background-color: #babc4d;
+            border-top: 1px solid #eee;
+        }
+
+        .profile-stats ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .profile-stats li {
+            font-size: 16px;
+        }
+
+        /* Gallery */
+        .gallery {
+            margin-left: 90px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .gallery-item-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .gallery-item-info ul {
+            display: flex;
+            gap: 10px;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .gallery-item-info i {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="profile-header">
+            <div class="profile-image">
+                <img src="{{ profile.image.url }}" alt="Profile Image" class="profile-image-img">
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-name">
+                    {% if profile.first_name %}
+                        <h3>{{ profile.first_name }} {{ profile.last_name }}</h3>
+                    {% endif %}
+                    <h5>@{{ profile.user.username }}</h5>
+                </div>
+
+                <div class="profile-actions">
+                    {% if request.user.is_authenticated and request.user == profile.user %}
+                        <a href="{% url 'editprofile' %}" class="btn profile-btn">Edit Profile</a>
+                        <form action="{% url 'sign-out' %}" method="post" class="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn profile-btn">Logout</button>
+                        </form>
+                    {% endif %}
+
+                    {% if request.user.is_authenticated and request.user != profile.user %}
+                        {% if follow_status %}
+                            <a href="{% url 'follow' profile.user 0 %}" class="btn profile-btn unfollow-btn">Unfollow</a>
+                        {% else %}
+                            <a href="{% url 'follow' profile.user 1 %}" class="btn profile-btn follow-btn">Follow</a>
+                        {% endif %}
+                        <a href="{% url 'conversation' profile.user %}" class="btn profile-btn">Message</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="profile-bio">
+            {% if profile.bio %}
+                <p><strong>Bio:</strong> {{ profile.bio }}</p>
+            {% endif %}
+            {% if profile.location %}
+                <p><strong>Location:</strong> {{ profile.location }}</p>
+            {% endif %}
+            {% if profile.url %}
+                <p><strong>Website:</strong> <a href="{{ profile.url }}" target="_blank">{{ profile.url }}</a></p>
+            {% endif %}
+        </div>
+
+        <div class="profile-stats">
+            <ul>
+                <li><span class="stat-count">{{ posts_count }}</span> posts</li>
+                <li><span class="stat-count">{{ followers_count }}</span> followers</li>
+                <li><span class="stat-count">{{ following_count }}</span> following</li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+        <div class="gallery">
+            {% for post in posts %}
+                <a href="{{ post.get_absolute_url }}">
+                    <div class="gallery-item">
+                        <img src="{{ post.picture.url }}" class="gallery-image" alt="Post Image">
+                        <div class="gallery-item-info">
+                            <ul>
+                                <li><i class="fas fa-heart"></i> {{ post.likes }}</li>
+                                <li><i class="fas fa-comment"></i> {{ post.comment.count }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </main>
+
+{% endblock content %}
+</body>
+</html>

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<br><br>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://kit.fontawesome.com/fc1e235b2e.js"></script>
+  <link rel="stylesheet" href="{% static 'assets2/style.css' %}">
+  <title>Login Form</title>
+
+  <style>
+    body {
+      background-color: #babc4d;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    #wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+
+    .container {
+      background-color: #babc4d;
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-data {
+      width: 100%;
+    }
+
+    .logo h3 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="file"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background-color: #d6d66f;
+      color: #333;
+    }
+
+    .form-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-btn:hover {
+      background-color: #222;
+    }
+    
+  </style>
+</head>
+
+<body>
+
+  <div id="wrapper">
+    <div class="container">
+      <div class="form-data">
+        <form action="" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="logo">
+            <h3>Create New Post</h3>
+          </div>
+
+          {{ form.picture }} <br>
+          {{ form.caption }} <br>
+          {{ form.tags }} <br>
+          <button class="form-btn" type="submit">Post</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
+{% endblock content %}
